@@ -203,7 +203,16 @@
 
   function downloadCSV() {
     if (!questionLog.length) return;
-    const rows = questionLog.map(q => `"${q.timestamp}","${q.question.replace(/"/g, '""')}"`).join('\n');
+
+    const password = prompt('Enter download password:');
+    if (password !== 'chicago1985') {
+      alert('Incorrect password.');
+      return;
+    }
+
+    const rows = questionLog.map(q =>
+      `"${q.timestamp}","${q.question.replace(/"/g, '""')}"`
+    ).join('\n');
     const blob = new Blob([`Timestamp,Question\n${rows}`], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
