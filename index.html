@@ -70,13 +70,6 @@
   .escalation-sub { font-size: 12px; font-weight: 300; color: var(--mid); }
   .escalation-link { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--terra); text-decoration: none; border-bottom: 1px solid var(--terra); padding-bottom: 1px; white-space: nowrap; }
 
-  .log-bar { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .log-label { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-  .log-count { font-size: 13px; color: var(--mid); font-weight: 300; }
-  .download-btn { background: transparent; border: 1px solid var(--border); color: var(--mid); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 18px; cursor: pointer; border-radius: 2px; transition: all 0.2s; }
-  .download-btn:hover { border-color: var(--terra); color: var(--terra); }
-  .download-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
   .blocked-state { display: none; padding: 16px 22px; background: var(--red); color: var(--white); border-radius: 2px; font-size: 14px; font-weight: 300; line-height: 1.6; text-align: center; }
   .blocked-state.visible { display: block; }
 </style>
@@ -127,23 +120,15 @@
       </div>
       <a class="escalation-link" href="https://www.ovetta-sampson.com" target="_blank">Visit ovetta-sampson.com →</a>
     </div>
-
-    <div class="log-bar">
-      <div>
-        <div class="log-label">Anonymous question log</div>
-        <div class="log-count" id="logCount">0 questions stored</div>
-      </div>
-      <button class="download-btn" id="downloadBtn" onclick="downloadCSV()" disabled>Download CSV</button>
-    </div>
   </div>
 </div>
 
 <script>
   // SECURITY NOTE: No system prompt, no model, no conversation history here.
-  // All of that lives securely in pages/api/chat.js on the server.
+  // All of that lives securely in api/chat.js on the server.
   // This file sends ONLY the user's message to the API.
+  // Questions are logged server-side to Upstash — not in the browser.
 
-  let questionLog = [];
   let offenseCount = 0;
   let sessionBlocked = false;
   let escalationShown = false;
@@ -190,36 +175,6 @@
     if (t) t.remove();
   }
 
-  function updateLogCount() {
-    const count = questionLog.length;
-    document.getElementById('logCount').textContent = `${count} question${count !== 1 ? 's' : ''} stored`;
-    document.getElementById('downloadBtn').disabled = count === 0;
-  }
-
-  function logQuestion(question) {
-    questionLog.push({ timestamp: new Date().toISOString(), question });
-    updateLogCount();
-  }
-
-  function downloadCSV() {
-    if (!questionLog.length) return;
-
-    const password = prompt('Enter download password:');
-    if (password !== 'chicago1985') {
-      alert('Incorrect password.');
-      return;
-    }
-
-    const rows = questionLog.map(q =>
-      `"${q.timestamp}","${q.question.replace(/"/g, '""')}"`
-    ).join('\n');
-    const blob = new Blob([`Timestamp,Question\n${rows}`], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `orunmila_questions_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-  }
-
   async function sendQuestion() {
     if (sessionBlocked) return;
     const input = document.getElementById('questionInput');
@@ -231,16 +186,13 @@
     input.style.height = 'auto';
 
     addMessage('student', question);
-    logQuestion(question);
     showTyping();
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userMessage: question
-        })
+        body: JSON.stringify({ userMessage: question })
       });
 
       const data = await response.json();
