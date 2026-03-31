@@ -141,34 +141,42 @@ function containsInjection(text) {
 }
 
 // ─── Rate Limiter ─────────────────────────────────────────────────
-// Stores request counts per IP in memory
-// Limit: 20 requests per IP per hour
 const rateLimitMap = new Map();
 const RATE_LIMIT = 20;
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_WINDOW_MS = 60 * 60 * 1000;
 
 function isRateLimited(ip) {
   const now = Date.now();
   const record = rateLimitMap.get(ip);
-
   if (!record) {
     rateLimitMap.set(ip, { count: 1, windowStart: now });
     return false;
   }
-
-  // Reset window if it's expired
   if (now - record.windowStart > RATE_WINDOW_MS) {
     rateLimitMap.set(ip, { count: 1, windowStart: now });
     return false;
   }
-
-  // Within window — check count
-  if (record.count >= RATE_LIMIT) {
-    return true;
-  }
-
+  if (record.count >= RATE_LIMIT) return true;
   record.count++;
   return false;
+}
+
+// ─── Upstash Logger ───────────────────────────────────────────────
+async function logToUpstash(question) {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return;
+
+  const entry = JSON.stringify({
+    timestamp: new Date().toISOString(),
+    question: question
+  });
+
+  // Push to a Redis list called "question_log"
+  await fetch(`${url}/lpush/question_log/${encodeURIComponent(entry)}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
 }
 
 export default async function handler(req, res) {
@@ -181,7 +189,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
-  // ─── Rate limit check ───────────────────────────────────────────
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
     || req.socket?.remoteAddress
     || 'unknown';
@@ -211,6 +218,9 @@ export default async function handler(req, res) {
     });
   }
 
+  // ─── Log question to Upstash (non-blocking) ───────────────────
+  logToUpstash(userMessage).catch(() => {});
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -223,9 +233,7 @@ export default async function handler(req, res) {
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         system: SYSTEM_PROMPT,
-        messages: [
-          { role: 'user', content: userMessage }
-        ]
+        messages: [{ role: 'user', content: userMessage }]
       })
     });
 
