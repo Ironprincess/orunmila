@@ -1,4 +1,4 @@
-const DOWNLOAD_PASSWORD = 'your-new-password-here';
+const DOWNLOAD_PASSWORD = 'thedailyshow';
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
