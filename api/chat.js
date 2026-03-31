@@ -140,6 +140,37 @@ function containsInjection(text) {
   return INJECTION_PATTERNS.some(pattern => pattern.test(text));
 }
 
+// ─── Rate Limiter ─────────────────────────────────────────────────
+// Stores request counts per IP in memory
+// Limit: 20 requests per IP per hour
+const rateLimitMap = new Map();
+const RATE_LIMIT = 20;
+const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+
+  // Reset window if it's expired
+  if (now - record.windowStart > RATE_WINDOW_MS) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+
+  // Within window — check count
+  if (record.count >= RATE_LIMIT) {
+    return true;
+  }
+
+  record.count++;
+  return false;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -148,6 +179,17 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured' });
+  }
+
+  // ─── Rate limit check ───────────────────────────────────────────
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+    || req.socket?.remoteAddress
+    || 'unknown';
+
+  if (isRateLimited(ip)) {
+    return res.status(429).json({
+      error: 'Too many requests. Please wait before asking another question.'
+    });
   }
 
   const { userMessage } = req.body;
