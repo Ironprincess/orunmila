@@ -161,6 +161,19 @@ function isRateLimited(ip) {
   return false;
 }
 
+// ─── Cohort Code Validator ────────────────────────────────────────
+// Add cohort codes to Vercel env as COHORT_CODES (comma-separated)
+// e.g.  COHORT_CODES=MINDFUL-APR26,MINDFUL-MAY26
+function isValidCohortCode(code) {
+  if (!code || typeof code !== 'string') return false;
+  const raw = process.env.COHORT_CODES || '';
+  const validCodes = raw
+    .split(',')
+    .map(c => c.trim().toUpperCase())
+    .filter(Boolean);
+  return validCodes.includes(code.trim().toUpperCase());
+}
+
 // ─── Upstash Logger ───────────────────────────────────────────────
 async function logToUpstash(question) {
   const url = process.env.KV_REST_API_URL;
@@ -172,7 +185,6 @@ async function logToUpstash(question) {
     question: question
   });
 
-  // Push to a Redis list called "question_log"
   await fetch(`${url}/lpush/question_log/${encodeURIComponent(entry)}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` }
@@ -182,6 +194,26 @@ async function logToUpstash(question) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // ─── Cohort Code Check ────────────────────────────────────────
+  // Handle code validation as a lightweight pre-flight request
+  if (req.body?.action === 'validate_code') {
+    const { cohortCode } = req.body;
+    if (isValidCohortCode(cohortCode)) {
+      return res.status(200).json({ valid: true });
+    } else {
+      return res.status(401).json({ valid: false, error: 'Invalid access code.' });
+    }
+  }
+
+  // ─── All chat requests must include a valid cohort code ───────
+  const { userMessage, cohortCode } = req.body;
+
+  if (!isValidCohortCode(cohortCode)) {
+    return res.status(401).json({
+      error: 'A valid cohort access code is required.'
+    });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -198,8 +230,6 @@ module.exports = async function handler(req, res) {
       error: 'Too many requests. Please wait before asking another question.'
     });
   }
-
-  const { userMessage } = req.body;
 
   if (!userMessage || typeof userMessage !== 'string') {
     return res.status(400).json({ error: 'Invalid request' });
