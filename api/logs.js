@@ -1,8 +1,11 @@
-const DOWNLOAD_PASSWORD = 'thedailyshow';
-
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const DOWNLOAD_PASSWORD = process.env.LOGS_DOWNLOAD_PASSWORD;
+  if (!DOWNLOAD_PASSWORD) {
+    return res.status(500).json({ error: 'Logs access not configured' });
   }
 
   const { password } = req.query;
