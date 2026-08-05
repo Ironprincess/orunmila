@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orunmila Pro — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #FDFBF7; color: #0E2B33; font-family: "DM Sans", Georgia, serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px; }
+  h1 { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; font-size: 30px; margin-bottom: 24px; }
+  h2 { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; font-size: 20px; margin: 0 0 14px; color: #DD7F41; }
+  .panel { background: #F4EEE6; border-radius: 12px; padding: 22px; margin-bottom: 20px; }
+  label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 12px 0 5px; color: #5C6B70; }
+  input, select { width: 100%; padding: 10px 12px; border: 1px solid #D8CFC0; border-radius: 8px; font-family: inherit; font-size: 14px; background: #fff; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  button { margin-top: 16px; background: #0E2B33; color: #fff; border: none; border-radius: 8px; padding: 11px 22px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+  button:hover { background: #DD7F41; }
+  button.danger { background: transparent; color: #B0442A; padding: 4px 10px; margin: 0; font-size: 12px; border: 1px solid #B0442A; }
+  button.danger:hover { background: #B0442A; color: #fff; }
+  .msg { font-size: 13px; color: #DD7F41; font-weight: 500; margin-top: 10px; min-height: 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 6px 8px; border-bottom: 2px solid #D8CFC0; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #5C6B70; }
+  td { padding: 8px; border-bottom: 1px solid #E5DDD0; }
+  .mono { font-family: monospace; font-weight: 700; }
+  tr.expired td { opacity: .45; }
+  .hidden { display: none !important; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Orunmila Pro · Code Admin</h1>
+
+  <div class="panel" id="lockPanel">
+    <label for="secret">Admin Secret</label>
+    <input type="password" id="secret" placeholder="Paste the admin secret">
+    <button id="unlockBtn">Unlock</button>
+    <p class="msg" id="lockMsg"></p>
+  </div>
+
+  <div class="hidden" id="adminArea">
+    <div class="panel">
+      <h2>Create A Code</h2>
+      <div class="row">
+        <div>
+          <label for="type">Type</label>
+          <select id="type">
+            <option value="monthly">Monthly (Shared Subscriber Code)</option>
+            <option value="annual">Annual (Personal 12-Month Code)</option>
+            <option value="cohort">Cohort (Class Code)</option>
+          </select>
+        </div>
+        <div>
+          <label for="days">Days Until Expiry</label>
+          <input type="number" id="days" value="35">
+        </div>
+      </div>
+      <label for="label">Label (For The Tracker — e.g., "Aug 2026 Monthly" or "Sept Cohort")</label>
+      <input id="label">
+      <label for="customCode">Custom Code (Optional — Leave Blank To Auto-Generate)</label>
+      <input id="customCode" placeholder="e.g., SEPT2026" style="text-transform: uppercase;">
+      <button id="createBtn">Create Code</button>
+      <p class="msg" id="createMsg"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Active & Recent Codes</h2>
+      <table>
+        <thead><tr><th>Code</th><th>Type</th><th>Label</th><th>Expires</th><th></th></tr></thead>
+        <tbody id="codeRows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+var secret = "";
+function $(id) { return document.getElementById(id); }
+function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function api(method, body) {
+  return fetch("/api/pro-codes", {
+    method: method,
+    headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function(r){ return r.json(); });
+}
+
+function load() {
+  return api("GET").then(function(data) {
+    if (data.error) {
+      $("lockMsg").textContent = data.error === "Unauthorized" ? "Wrong secret." : data.error;
+      return false;
+    }
+    renderCodes(data.codes || []);
+    $("lockPanel").classList.add("hidden");
+    $("adminArea").classList.remove("hidden");
+    return true;
+  }).catch(function() {
+    $("lockMsg").textContent = "Couldn't reach the server — try again.";
+    return false;
+  });
+}
+
+function renderCodes(codes) {
+  var html = "";
+  codes.forEach(function(c) {
+    html += '<tr class="' + (c.expired ? "expired" : "") + '">' +
+      '<td class="mono">' + esc(c.code) + "</td>" +
+      "<td>" + esc(c.type) + "</td>" +
+      "<td>" + esc(c.label || "") + "</td>" +
+      "<td>" + new Date(c.expiresAt).toLocaleDateString() + (c.expired ? " · EXPIRED" : "") + "</td>" +
+      '<td><button class="danger" data-code="' + esc(c.code) + '">Revoke</button></td></tr>';
+  });
+  $("codeRows").innerHTML = html || '<tr><td colspan="5" style="color:#8A8378;">No codes yet — create your first one above.</td></tr>';
+  Array.prototype.forEach.call(document.querySelectorAll("[data-code]"), function(b) {
+    b.onclick = function() {
+      var code = b.getAttribute("data-code");
+      if (!confirm("Revoke " + code + "? This locks out everyone using it immediately.")) return;
+      api("DELETE", { code: code }).then(load);
+    };
+  });
+}
+
+$("unlockBtn").onclick = function() {
+  secret = $("secret").value.trim();
+  if (secret) load();
+};
+$("secret").addEventListener("keydown", function(e){ if (e.key === "Enter") $("unlockBtn").click(); });
+
+$("createBtn").onclick = function() {
+  $("createMsg").textContent = "Creating…";
+  api("POST", {
+    type: $("type").value,
+    days: Number($("days").value),
+    label: $("label").value,
+    code: $("customCode").value.toUpperCase() || undefined
+  }).then(function(data) {
+    if (data.created) {
+      $("createMsg").textContent = "Created: " + data.created.code + " — expires " + new Date(data.created.expiresAt).toLocaleDateString();
+      $("label").value = ""; $("customCode").value = "";
+      load();
+    } else {
+      $("createMsg").textContent = data.error || "Failed";
+    }
+  }).catch(function(){ $("createMsg").textContent = "Failed — try again."; });
+};
+</script>
+</body>
+</html>
