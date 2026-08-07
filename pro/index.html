@@ -110,7 +110,7 @@
     <p class="gate-msg hidden" id="gateMsg"></p>
   </div>
   <p class="gate-links">
-    No code yet? <a id="linkMonthly1" href="#">Subscribe Monthly</a> · <a id="linkAnnual1" href="#">Get Annual Access</a><br>
+    No code yet? <a id="linkMonthly1" href="#">Subscribe to Orunmila Pro</a><br>
     Taking a Right AI™ class? Your cohort code is in your welcome email.
   </p>
 </div>
@@ -120,16 +120,11 @@
   <div class="eyebrow">Right AI™ · Practice Coach</div>
   <h1>Your Access Has Ended</h1>
   <p class="lede">Your code has expired — but your practice doesn't have to. Keep sharpening your prompts, your assessments, and your saved library with a subscription. Your saved work is waiting for you.</p>
-  <div class="renew-row">
-    <a class="renew-card" id="linkMonthly2" href="#">
-      <div class="renew-title">Monthly</div>
+  <div class="renew-row" style="grid-template-columns: 1fr;">
+    <a class="renew-card featured" id="linkMonthly2" href="#">
+      <div class="renew-title">Orunmila Pro</div>
       <div class="renew-desc">Full access, month to month. A new code lands in your inbox every month.</div>
-      <div class="renew-cta">Subscribe Monthly →</div>
-    </a>
-    <a class="renew-card featured" id="linkAnnual2" href="#">
-      <div class="renew-title">Annual</div>
-      <div class="renew-desc">A full year with one personal code. Pay upfront or on a monthly payment plan.</div>
-      <div class="renew-cta">Get Annual Access →</div>
+      <div class="renew-cta">Subscribe to Orunmila Pro →</div>
     </a>
   </div>
   <p class="gate-links">Entered the wrong code? <a href="#" id="tryAgain">Try A Different Code</a></p>
@@ -177,9 +172,8 @@
 <div class="toast hidden" id="toast"></div>
 
 <script>
-// ── Config: replace with your real Squarespace product URLs before launch ──
-var SQUARESPACE_MONTHLY_URL = "https://www.ovetta-sampson.com/#monthly"; // TODO
-var SQUARESPACE_ANNUAL_URL  = "https://www.ovetta-sampson.com/#annual";  // TODO
+// ── Config: Squarespace product URL ──
+var SQUARESPACE_MONTHLY_URL = "https://www.rightainow.com/shop/p/orunmila-ai-teaching-assistant-pro-edition";
 
 var MODES = [
   { id: "assess", title: "Prompt Assessment", desc: "Paste a prompt. Get it scored against CO-STAR™ with one targeted fix.",
@@ -213,7 +207,6 @@ function setScreen(name) {
 // ── Boot ──
 (function boot() {
   ["linkMonthly1","linkMonthly2"].forEach(function(id){ $(id).href = SQUARESPACE_MONTHLY_URL; });
-  ["linkAnnual1","linkAnnual2"].forEach(function(id){ $(id).href = SQUARESPACE_ANNUAL_URL; });
 
   var mid = localStorage.getItem("orn_pro_member");
   if (!mid) { mid = "m" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem("orn_pro_member", mid); }
