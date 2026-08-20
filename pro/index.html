@@ -322,7 +322,7 @@ function renderThread() {
     if (t.role === "user") html += '<div class="msg user"><p>' + esc(t.content) + "</p></div>";
     else html += '<div class="msg assistant">' + renderReplyHTML(t.content, saveable) + "</div>";
   });
-  if (state.busy) html += '<div class="msg assistant thinking">Orunmila is thinking…</div>';
+  if (state.busy) html += '<div class="msg assistant thinking">Orunmila is computing…</div>';
   box.innerHTML = html;
   Array.prototype.forEach.call(box.querySelectorAll("[data-save]"), function(b) {
     b.onclick = function(){ saveToLibrary(b.parentElement.querySelector("pre").textContent); };
