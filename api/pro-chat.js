@@ -28,8 +28,8 @@ module.exports = async (req, res) => {
       return res.status(403).json({ error: access.expired ? "expired" : "invalid" });
     }
 
-    // 2 - Mode + system prompt
-    const system = buildSystemPrompt(mode, !!upsellAllowed);
+    // 2 - Mode + system prompt (access.type lets modes serve cohort vs. subscriber variants)
+    const system = buildSystemPrompt(mode, !!upsellAllowed, access.type);
     if (!system) return res.status(400).json({ error: "Unknown mode" });
 
     // 3 - Message shape
@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
     // 5 - Injection filter
     if (INJECTION_PATTERNS.some((p) => p.test(userText))) {
       return res.status(200).json({
-        reply: "I'm only able to help with Right AI practice work. What would you like to work on?",
+        reply: "This is a space for Right AI practice work — what would you like to sharpen?",
         filtered: true,
       });
     }
