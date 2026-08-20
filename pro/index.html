@@ -16,7 +16,6 @@
   a { color: #DD7F41; }
   button { font-family: "DM Sans", sans-serif; cursor: pointer; }
 
-  /* Gate + expired */
   .gate { max-width: 560px; margin: 0 auto; padding: 72px 24px; text-align: center; }
   .gate h1 { font-size: 46px; margin: 14px 0 2px; }
   .phonetic { font-size: 13px; color: #8A8378; letter-spacing: .08em; margin: 0 0 18px; }
@@ -27,17 +26,14 @@
   .gate-card input:focus { outline: 2px solid #DD7F41; border-color: transparent; }
   .btn { margin-top: 14px; width: 100%; background: #0E2B33; color: #fff; border: none; border-radius: 9px; padding: 13px; font-size: 15px; font-weight: 500; transition: background .15s; }
   .btn:hover { background: #DD7F41; }
-  .btn:disabled { opacity: .5; cursor: default; }
   .gate-msg { font-size: 13px; color: #B0442A; margin: 10px 0 0; }
   .gate-links { font-size: 13px; color: #5C6B70; line-height: 1.9; }
-  .renew-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0 20px; }
-  .renew-card { background: #fff; border-radius: 14px; padding: 22px; text-align: left; text-decoration: none; color: inherit; border: 1.5px solid transparent; transition: border .15s; display: block; }
-  .renew-card:hover, .renew-card.featured { border-color: #DD7F41; }
+  .renew-row { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 28px auto 20px; max-width: 380px; }
+  .renew-card { background: #fff; border-radius: 14px; padding: 22px; text-align: left; text-decoration: none; color: inherit; border: 1.5px solid #DD7F41; display: block; }
   .renew-title { font-family: "DM Serif Display", Georgia, serif; font-size: 21px; margin-bottom: 6px; }
   .renew-desc { font-size: 13px; line-height: 1.55; color: #3D4D52; margin-bottom: 14px; }
   .renew-cta { font-size: 13px; font-weight: 700; color: #DD7F41; }
 
-  /* Floor */
   .floor { max-width: 860px; margin: 0 auto; padding: 30px 20px 60px; }
   header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
   .wordmark { font-size: 30px; }
@@ -75,7 +71,6 @@
   .send:hover { background: #DD7F41; }
   .send:disabled { opacity: .5; }
 
-  /* Library drawer */
   .drawer-scrim { position: fixed; inset: 0; background: rgba(14,43,51,.35); display: flex; justify-content: flex-end; z-index: 20; }
   .drawer { width: min(440px, 92vw); background: #FDFBF7; height: 100%; overflow-y: auto; padding: 24px; }
   .drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -89,7 +84,7 @@
   .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); background: #0E2B33; color: #F4EEE6; border-radius: 24px; padding: 9px 20px; font-size: 13px; z-index: 30; }
 
   @media (max-width: 640px) {
-    .mode-rail, .renew-row { grid-template-columns: 1fr; }
+    .mode-rail { grid-template-columns: 1fr; }
     .gate h1 { font-size: 36px; }
     header { flex-direction: column; align-items: flex-start; gap: 12px; }
   }
@@ -97,16 +92,16 @@
 </head>
 <body>
 
-<!-- ─── GATE ─── -->
+<!-- GATE -->
 <div id="screen-gate" class="gate">
   <div class="eyebrow">Right AI™ · Practice Coach</div>
   <h1>Orunmila <span class="pro-mark">Pro</span></h1>
   <p class="phonetic">oh-ROON-mee-lah</p>
-  <p class="lede">A name drawn from Yoruba tradition, where Orunmila is the orisha of wisdom, knowledge, and clarity. This is the Playground — where prompts get assessed, built, and sharpened against the Right AI™ frameworks.</p>
+  <p class="lede">A name drawn from Yoruba tradition, where Orunmila is the orisha of wisdom, knowledge, and clarity. This is the practice floor — where prompts get assessed, built, and sharpened against the Right AI™ frameworks.</p>
   <div class="gate-card">
     <label for="codeInput">Access Code</label>
     <input id="codeInput" placeholder="Enter your code" spellcheck="false" autocomplete="off">
-    <button class="btn" id="unlockBtn">Enter The Playground</button>
+    <button class="btn" id="unlockBtn">Enter The Practice Floor</button>
     <p class="gate-msg hidden" id="gateMsg"></p>
   </div>
   <p class="gate-links">
@@ -115,22 +110,22 @@
   </p>
 </div>
 
-<!-- ─── EXPIRED ─── -->
+<!-- EXPIRED -->
 <div id="screen-expired" class="gate hidden">
   <div class="eyebrow">Right AI™ · Practice Coach</div>
   <h1>Your Access Has Ended</h1>
   <p class="lede">Your code has expired — but your practice doesn't have to. Keep sharpening your prompts, your assessments, and your saved library with a subscription. Your saved work is waiting for you.</p>
-  <div class="renew-row" style="grid-template-columns: 1fr;">
-    <a class="renew-card featured" id="linkMonthly2" href="#">
+  <div class="renew-row">
+    <a class="renew-card" id="linkMonthly2" href="#">
       <div class="renew-title">Orunmila Pro</div>
-      <div class="renew-desc">Full access, month to month. A new code lands in your inbox every month.</div>
-      <div class="renew-cta">Subscribe to Orunmila Pro →</div>
+      <div class="renew-desc">Full access to the practice floor and your saved library, month to month. A new code lands in your inbox each month.</div>
+      <div class="renew-cta">Subscribe →</div>
     </a>
   </div>
   <p class="gate-links">Entered the wrong code? <a href="#" id="tryAgain">Try A Different Code</a></p>
 </div>
 
-<!-- ─── PRACTICE FLOOR ─── -->
+<!-- PRACTICE FLOOR -->
 <div id="screen-floor" class="floor hidden">
   <header>
     <div>
@@ -140,6 +135,7 @@
     <div class="header-right">
       <span class="expiry-pill hidden" id="expiryPill"></span>
       <button class="ghost" id="libraryBtn">My Library</button>
+      <button class="ghost" id="logoutBtn">Log Out</button>
     </div>
   </header>
 
@@ -172,21 +168,25 @@
 <div class="toast hidden" id="toast"></div>
 
 <script>
-// ── Config: Squarespace product URL ──
+// Real Squarespace product URL (monthly subscription; annual billing offered inside it)
 var SQUARESPACE_MONTHLY_URL = "https://www.rightainow.com/shop/p/orunmila-ai-teaching-assistant-pro-edition";
 
 var MODES = [
   { id: "assess", title: "Prompt Assessment", desc: "Paste a prompt. Get it scored against CO-STAR™ with one targeted fix.",
     placeholder: "Paste the prompt you want assessed…",
-    intro: "Paste any prompt you've written and it'll be scored against all six CO-STAR™ dimensions, and you'll get the one fix that matters most.", live: true },
+    intro: "Paste any prompt you've written and it gets scored against all six CO-STAR™ dimensions, then the one fix that matters most.", live: true },
   { id: "costar", title: "CO-STAR Builder", desc: "Build a complete prompt, one dimension at a time, with pushback.",
     placeholder: "Tell me what you want your prompt to accomplish…",
     intro: "Let's build your prompt together — Context first. What's the situation the AI needs to understand before it does anything?", live: true },
   { id: "tokens", title: "Token & Context Check", desc: "See what's eating your context window and where to trim.",
     placeholder: "Paste a prompt, system prompt, or document to check…",
-    intro: "Paste your prompt or document and see what's consuming your context window — and your top two trims.", live: true },
-  { id: "space", title: "SPACE™ Starter", desc: "Draft a working system prompt skeleton, dimension by dimension.", live: false },
-  { id: "docs", title: "Behavior Doc & Knowledge Brief", desc: "Templates for behavior.md and knowledge briefs, with review.", live: false },
+    intro: "Paste your prompt or document and you'll see what's consuming your context window — plus the top two trims.", live: true },
+  { id: "space", title: "SPACE™ Starter", desc: "Draft a working system prompt skeleton, dimension by dimension.",
+    placeholder: "Tell me what system or agent you're building…",
+    intro: "Let's build a SPACE™ skeleton for your system. First — Scope: what should this AI be allowed to do, and what's explicitly off-limits?", live: true },
+  { id: "docs", title: "Behavior Doc & Knowledge Brief", desc: "Templates for behavior.md and knowledge briefs, with review.",
+    placeholder: "Ask for a template, or paste a draft to review…",
+    intro: "Two things live here: a fill-in template for a behavior doc or knowledge brief, and a review of your draft against it. Which do you need — a template, or a review?", live: true },
   { id: "drills", title: "Constitution Drills", desc: "Weekly flawed-constitution drills. Find the flaw, fix it, get scored.", live: false }
 ];
 
@@ -198,15 +198,11 @@ function hide(id) { $(id).classList.add("hidden"); }
 function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 function estimateTokens(t) { return Math.max(1, Math.round((t || "").length / 4)); }
 function toast(m) { var t = $("toast"); t.textContent = m; show("toast"); setTimeout(function(){ hide("toast"); }, 2400); }
+function setScreen(name) { ["screen-gate", "screen-expired", "screen-floor"].forEach(hide); show("screen-" + name); }
 
-function setScreen(name) {
-  ["screen-gate", "screen-expired", "screen-floor"].forEach(hide);
-  show("screen-" + name);
-}
-
-// ── Boot ──
 (function boot() {
-  ["linkMonthly1","linkMonthly2"].forEach(function(id){ $(id).href = SQUARESPACE_MONTHLY_URL; });
+  $("linkMonthly1").href = SQUARESPACE_MONTHLY_URL;
+  $("linkMonthly2").href = SQUARESPACE_MONTHLY_URL;
 
   var mid = localStorage.getItem("orn_pro_member");
   if (!mid) { mid = "m" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem("orn_pro_member", mid); }
@@ -220,7 +216,8 @@ function setScreen(name) {
   $("unlockBtn").onclick = function(){ unlock($("codeInput").value, false); };
   $("codeInput").addEventListener("keydown", function(e){ if (e.key === "Enter") unlock($("codeInput").value, false); });
   $("codeInput").addEventListener("input", function(){ this.value = this.value.toUpperCase(); });
-  $("tryAgain").onclick = function(e){ e.preventDefault(); localStorage.removeItem("orn_pro_code"); $("codeInput").value = ""; setScreen("gate"); };
+  $("tryAgain").onclick = function(e){ e.preventDefault(); logout(); };
+  $("logoutBtn").onclick = logout;
   $("sendBtn").onclick = send;
   $("input").addEventListener("keydown", function(e){ if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send(); });
   $("input").addEventListener("input", updateHint);
@@ -228,6 +225,15 @@ function setScreen(name) {
   $("closeDrawer").onclick = function(){ hide("drawerScrim"); };
   $("drawerScrim").addEventListener("click", function(e){ if (e.target === this) hide("drawerScrim"); });
 })();
+
+function logout() {
+  localStorage.removeItem("orn_pro_code");
+  state.code = ""; state.expiresAt = null; state.activeMode = null;
+  state.threads = {}; state.upsellSpent = false;
+  $("codeInput").value = "";
+  hide("chatBox"); show("emptyState");
+  setScreen("gate");
+}
 
 function unlock(rawCode, silent) {
   var c = (rawCode || "").trim().toUpperCase();
@@ -245,7 +251,7 @@ function unlock(rawCode, silent) {
     } else if (res.expired) {
       state.code = c; setScreen("expired");
     } else if (!silent) {
-      msg.textContent = "That code isn't recognized. Check for typos, or use the links below to get access."; show("gateMsg");
+      msg.textContent = "That code isn't recognized. Check for typos, or use the link below to get access."; show("gateMsg");
     }
   }).catch(function(){
     if (!silent) { msg.textContent = "Couldn't reach Orunmila — try again in a moment."; show("gateMsg"); }
@@ -258,11 +264,12 @@ function updateExpiryPill() {
   if (days <= 7) {
     $("expiryPill").textContent = "Code Expires In " + days + (days === 1 ? " Day" : " Days");
     show("expiryPill");
-  }
+  } else { hide("expiryPill"); }
 }
 
 function buildModeRail() {
   var rail = $("modeRail");
+  rail.innerHTML = "";
   MODES.forEach(function(m) {
     var b = document.createElement("button");
     b.className = "mode-card" + (m.live ? "" : " locked");
@@ -298,7 +305,7 @@ function renderReplyHTML(text, allowSave) {
       html += '<div class="codewrap"><pre>' + esc(parts[i].trim()) + '</pre>' +
         (allowSave ? '<button class="save-btn" data-save="1">Save To Library</button>' : "") + '</div>';
     } else {
-      parts[i].split(/\n{2,}/).forEach(function(p){ if (p.trim()) html += "<p>" + esc(p.trim()) + "</p>"; });
+      parts[i].split(/\n{2,}/).forEach(function(pp){ if (pp.trim()) html += "<p>" + esc(pp.trim()) + "</p>"; });
     }
   }
   return html;
@@ -308,10 +315,12 @@ function renderThread() {
   var m = state.activeMode; if (!m) return;
   var thread = state.threads[m.id] || [];
   var box = $("messages");
+  // CO-STAR Builder and SPACE Starter both produce saveable code-block output
+  var saveable = (m.id === "costar" || m.id === "space");
   var html = '<div class="msg assistant">' + renderReplyHTML(m.intro, false) + "</div>";
   thread.forEach(function(t) {
     if (t.role === "user") html += '<div class="msg user"><p>' + esc(t.content) + "</p></div>";
-    else html += '<div class="msg assistant">' + renderReplyHTML(t.content, m.id === "costar") + "</div>";
+    else html += '<div class="msg assistant">' + renderReplyHTML(t.content, saveable) + "</div>";
   });
   if (state.busy) html += '<div class="msg assistant thinking">Orunmila is thinking…</div>';
   box.innerHTML = html;
@@ -377,7 +386,7 @@ function openLibrary() {
     .then(function(r){ return r.json(); }).then(function(res){
       var items = res.items || [];
       if (!items.length) {
-        $("libraryList").innerHTML = '<p class="drawer-empty">Nothing saved yet. Build a prompt in CO-STAR Builder and save it — it\'ll live here.</p>';
+        $("libraryList").innerHTML = '<p class="drawer-empty">Nothing saved yet. Build a prompt in CO-STAR Builder or SPACE™ Starter and save it — it\'ll live here.</p>';
         return;
       }
       var html = "";
