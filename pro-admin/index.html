@@ -162,7 +162,7 @@ function loadQuestions() {
       $("qRows").innerHTML = html;
       $("qMsg").textContent = data.count + " questions (showing newest first).";
     })
-    .catch(function(){ $("qRows").innerHTML = '<tr><td colspan="3" style="color:#B0442A;">Couldn\\'t load questions.</td></tr>'; });
+    .catch(function(){ $("qRows").innerHTML = '<tr><td colspan="3" style="color:#B0442A;">Could not load questions.</td></tr>'; });
 }
 
 function downloadCSV() {
