@@ -187,7 +187,9 @@ var MODES = [
   { id: "docs", title: "Behavior Doc & Knowledge Brief", desc: "Templates for behavior.md and knowledge briefs, with review.",
     placeholder: "Ask for a template, or paste a draft to review…",
     intro: "Two things live here: a fill-in template for a behavior doc or knowledge brief, and a review of your draft against it. Which do you need — a template, or a review?", live: true },
-  { id: "drills", title: "Constitution Drills", desc: "Weekly flawed-constitution drills. Find the flaw, fix it, get scored.", live: false }
+  { id: "drills", title: "Constitution Drills", desc: "Run a VPRT™ pass on a flawed constitution. Find the break, fix the chain.",
+    placeholder: "Ready for a drill? Type 'start' — or paste your fix to a snippet…",
+    intro: "Constitution drills sharpen your VPRT™ eye — Values, Principles, Rules, Tests. A flawed snippet appears; name what breaks the chain and rewrite it so it holds. Type 'start' for your first one.", live: true }
 ];
 
 var state = { code: "", expiresAt: null, memberId: "", activeMode: null, threads: {}, busy: false, upsellSpent: false };
@@ -322,7 +324,7 @@ function renderThread() {
     if (t.role === "user") html += '<div class="msg user"><p>' + esc(t.content) + "</p></div>";
     else html += '<div class="msg assistant">' + renderReplyHTML(t.content, saveable) + "</div>";
   });
-  if (state.busy) html += '<div class="msg assistant thinking">Orunmila is computing…</div>';
+  if (state.busy) html += '<div class="msg assistant thinking">Orunmila is thinking…</div>';
   box.innerHTML = html;
   Array.prototype.forEach.call(box.querySelectorAll("[data-save]"), function(b) {
     b.onclick = function(){ saveToLibrary(b.parentElement.querySelector("pre").textContent); };
